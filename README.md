@@ -8,3 +8,15 @@ Dabei sollen Methoden und Instrumente der Bildverarbeitung angewendet werden und
 
 * Klara :tiger2:
 * Moritz :new_moon_with_face:
+
+## Aufgaben
+
+### 1. Panda segmentieren
+
+Zuerst soll das szenische Bild in Panda und Umgebung segmentiert werden.
+Einige Möglichkeiten dafür sind:
+* Separation der Unterschiede im Farbraum über Schwellwert
+* Clustering mittels k-Means-Algorithmus
+* Segmentierung mit GrabCut-Algorithmus
+
+![Image of panda](/src/images/panda.jpg)
