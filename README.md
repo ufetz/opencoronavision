@@ -7,4 +7,4 @@ Dabei sollen Methoden und Instrumente der Bildverarbeitung angewendet werden und
 ## Das Team
 
 * Klara :tiger2:
-* Moritz :turtle:
+* Moritz :new_moon_with_face:
