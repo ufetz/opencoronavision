@@ -2,38 +2,39 @@ import cv2 as cv
 import numpy as np
 
 # Load image
-img_bgr = cv.imread('.\images\panda.jpg')
-newmask = cv.imread('.\images\panda_mask.jpg',0)
-
+img_bgr = cv.imread( '.\images\panda.jpg' )
 [height,width,channels] = img_bgr.shape
-#print(height,width,channels)
 
-# Convert to HSV
-img_hsv = cv.cvtColor(img_bgr, cv.COLOR_BGR2HSV)
+# Load manual mask
+mask_man = cv.imread( '.\images\pandaMaskGrabCut1.jpg', 0 )
 
-# Separate channels
-img_h = img_hsv[:,:,0]
-img_s = img_hsv[:,:,1]
-img_v = img_hsv[:,:,2]
+# Parameter for GrabCut
+mask = np.zeros( (height,width), np.uint8 )
+bgdModel = np.zeros( (1,65), np.float64 )
+fgdModel = np.zeros( (1,65), np.float64 )
 
-mask = np.zeros((height,width),np.uint8)
-mask[newmask==0] = 0
-mask[newmask==255] = 1
+# Edit mask
+mask[25:298, 140:368] = 3       # probable foreground
+mask[mask_man==0] = 0           # background
+mask[mask_man==255] = 1         # foreground
 
-bgdModel = np.zeros((1,65),np.float64)
-fgdModel = np.zeros((1,65),np.float64)
-cv.grabCut(img_bgr, mask, None, bgdModel, fgdModel, 5, cv.GC_INIT_WITH_MASK)
+# GrabCut with mask
+cv.grabCut( img_bgr, mask, None, bgdModel, fgdModel, 1, cv.GC_INIT_WITH_MASK )
 
-mask2 = np.where((mask==2)|(mask==0),0,1).astype('uint8')
+# Cut out segmentated panda
+mask_gray = np.where( (mask==2)|(mask==0), 0, 255 ).astype('uint8')
+img_fgd = cv.bitwise_and( img_bgr, img_bgr, mask=mask_gray )
 
-mask3 = np.where((mask==2)|(mask==0),0,255).astype('uint8')
-cv.imshow('mask3',mask3)
-
-img_seg = img_bgr*mask2[:,:,np.newaxis]
+# Color segmentated areas
+mask_bgr = np.zeros( (height,width,3), np.uint8 )
+mask_bgr[mask_gray==0] = [0,255,0]
+mask_bgr[mask_gray==255] = [0,0,255]
+img_seg = cv.addWeighted( img_bgr, 0.75, mask_bgr, 1-0.75, 0 )
 
 # Display images
-cv.imshow('original',img_bgr)
-cv.imshow('image segmentated',img_seg)
+cv.imshow( 'original image', img_bgr )
+cv.imshow( 'image foreground', img_fgd )
+cv.imshow( 'segmentated image', img_seg )
 
 cv.waitKey(0)
 cv.destroyAllWindows()
